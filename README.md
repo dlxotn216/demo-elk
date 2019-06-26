@@ -34,3 +34,33 @@ logstash-로 시작하도록 인덱스 설정 변경하여 아래와 같이 수 
   "lon": 126.9743,
   "lat": 37.5111
 }
+
+
+Apache access log 수집해보기
+-> Filebeat에서 elasticsearch로 바로 전송 하도록
+
+filebeat 설치
+rpm -Uvh로 설치
+
+/etc/filebeat/filebeat.yml에서
+paths 항목에 수집할 로그파일 위치 입력
+
+24번 라인의 enabled: false 옵션을 주석 처리
+
+filebeat에서 수집한 로그들의 index 이름 설정을 위해 아래와 같이 설정 (logstash로 내보내는 옵션은 주석 처리 확인)
+144 output.elasticsearch:
+145   # Array of hosts to connect to.
+146   hosts: ["localhost:9200"]
+147   index: "apache-access-%{+yyyy.MM.dd}"
+148
+149   # Optional protocol and basic auth credentials.
+150   #protocol: "https"
+151   #username: "elastic"
+152   #password: "changeme"
+153
+154 setup.template:
+155   name: 'apache-access'
+156   pattern: 'apache-access-*'
+157   enabled: true
+
+service filebeat restart 후 apache 로그 쌓이는 지 
